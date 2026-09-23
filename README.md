@@ -13,7 +13,7 @@ Fine-tuning a QA model on the 11th-grade Kazakh history textbook (pages 3–23, 
 | Stage | Result |
 |---|---|
 | OCR | 29,311 characters, 39 chunks |
-| SFT dataset | **154 pairs** (`history_sft_dataset.json`) |
+| SFT dataset | **154 pairs** (`data/history_sft_dataset.json`) |
 | Training | 160 steps, 8 epochs, loss **2.67 → 0.14** |
 | LLM-as-judge | accuracy **2.60 / 5**, faithfulness **3.20 / 5** |
 
@@ -43,7 +43,7 @@ No model ever grades its own output:
 | Epochs / steps | 8 / 160 |
 | Max seq length | 2048 |
 
-**Loss reduction** (full plot in `loss_curve.png`, notebook section 11)
+**Loss reduction** (full plot in `data/loss_curve.png`, notebook section 11)
 
 | Step | 10 | 30 | 60 | 90 | 120 | 140 | 160 |
 |---|---|---|---|---|---|---|---|
@@ -95,6 +95,37 @@ The base model confidently invented facts (Kashgari as an Armenian historian, Ya
 
 ---
 
+## Evaluation
+
+Two complementary evaluations, measuring different things:
+
+**1. LLM-as-judge** (notebook section 13) — `gpt-5` scores the *fine-tuned model's* answers 1–5 on accuracy and faithfulness, against the retrieved source chunk. Result: **2.60 / 3.20**.
+
+**2. Golden set** (`data/golden_set.json` + `evals/run_eval.py`) — 10 hand-verified questions where every expected fact was checked against `data/history_text.txt`. Scores two things the judge blurs together:
+
+- **Fact recall** — for answerable questions, did the answer contain the expected facts? Alias lists mean paraphrase isn't penalised.
+- **Refusal** — for the 3 questions *not* answerable from pages 3–23 (Balasaguni's century, plus two off-topic probes), did the model correctly decline instead of inventing an answer?
+
+Both directions matter: a model that answers everything scores well on recall and badly on refusal; one that refuses everything does the reverse.
+
+```bash
+cd webapp && uvicorn server:app --port 8000   # terminal 1
+python evals/run_eval.py                      # terminal 2
+```
+
+Latest result against the RAG webapp:
+
+| Metric | Score |
+|---|---|
+| Fact recall (answerable) | 7/7 (100%) |
+| Correct refusals | 3/3 (100%) |
+| Project-brief questions | 5/5 (100%) |
+| **Overall** | **10/10 (100%)** |
+
+Note this measures the **RAG webapp**, not the fine-tuned model — the harness targets an HTTP endpoint, and the LoRA adapter needs a GPU runtime. To evaluate the fine-tuned model against the same golden set, serve it behind a compatible `/api/ask` endpoint and point `--url` at it.
+
+---
+
 ## Known limitations
 
 Stated plainly, since the judge surfaced them:
@@ -110,13 +141,20 @@ Stated plainly, since the judge surfaced them:
 
 ```
 ├── history_finetuning.ipynb    # full pipeline, with saved cell outputs
-├── history_text.txt            # OCR output (29,311 characters)
-├── history_sft_dataset.json    # SFT dataset (154 pairs)
-├── loss_curve.png              # training loss plot
+├── data/
+│   ├── history_text.txt        # OCR output (29,311 characters)
+│   ├── history_sft_dataset.json# SFT dataset (154 pairs)
+│   ├── golden_set.json         # hand-verified eval set (10 questions)
+│   ├── loss_curve.png          # training loss plot
+│   └── *.pdf                   # source textbook (gitignored, 51 MB)
+├── evals/
+│   └── run_eval.py             # scores fact recall + refusal behavior
 └── webapp/                     # chat interface (RAG, not the fine-tuned model)
     ├── server.py
     └── static/
 ```
+
+> The project brief lists `history_text.txt` and `history_sft_dataset.json` as flat deliverables. They live in `data/` here for tidiness — copy them to the root when submitting if your grader expects the flat layout.
 
 ## Running it
 
@@ -134,4 +172,4 @@ uvicorn server:app --reload
 
 Open <http://127.0.0.1:8000>.
 
-> **Note:** `webapp/` is a separate RAG system — it passes `history_text.txt` to GPT-5-mini as context. It does **not** use the fine-tuned model and is not evidence of that model's quality. It is a demo interface.
+> **Note:** `webapp/` is a separate RAG system — it passes `data/history_text.txt` to GPT-5-mini as context. It does **not** use the fine-tuned model and is not evidence of that model's quality. It is a demo interface.

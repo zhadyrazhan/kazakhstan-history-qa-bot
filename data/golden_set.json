@@ -1,0 +1,122 @@
+{
+  "description": "Hand-verified evaluation set for the Kazakhstan history QA bot. Every expected_facts entry was checked against data/history_text.txt (OCR of textbook pages 3-23). Items marked answerable_from_source=false are NOT present in that page range - a correctly grounded model should refuse them rather than answer, and evals score them that way.",
+  "source": "История Казахстана, 11 класс, стр. 3-23",
+  "items": [
+    {
+      "id": "kashgari_who",
+      "question": "Кто такой Махмуд Кашгари?",
+      "question_type": "кто_такой",
+      "answerable_from_source": true,
+      "expected_facts": ["Дивани лугат ат-тюрк", "Словарь тюркских наречий"],
+      "acceptable_aliases": {
+        "Дивани лугат ат-тюрк": ["Диван лугат ат-турк", "Дивани лугат ат-турк", "Диван лугат ат-тюрк"]
+      },
+      "reference": "Потомок Богра хана, автор труда «Дивани лугат ат-тюрк» («Словарь тюркских наречий»), в котором обобщён материал о жизни и быте тюркских племён.",
+      "from_project_brief": true
+    },
+    {
+      "id": "balasaguni_book",
+      "question": "Какую книгу написал Юсуф Баласагуни?",
+      "question_type": "что_написал",
+      "answerable_from_source": true,
+      "expected_facts": ["Кутадгу билиг"],
+      "acceptable_aliases": {
+        "Кутадгу билиг": ["Кутадгу билик", "Благодатное знание"]
+      },
+      "reference": "Поэма «Кутадгу билиг» («Благодатное знание»).",
+      "from_project_brief": true
+    },
+    {
+      "id": "kutadgu_what",
+      "question": "Что такое Кутадгу билиг?",
+      "question_type": "значение",
+      "answerable_from_source": true,
+      "expected_facts": ["Баласагуни", "поэма"],
+      "acceptable_aliases": {
+        "поэма": ["поэму", "поэме", "трактат", "произведение"]
+      },
+      "reference": "Поэма Юсуфа Баласагуни («Благодатное знание»), где формулируются проблемы общества и государства и даются наставления правителям.",
+      "from_project_brief": true,
+      "known_failure": "Fine-tuned model attributes it to Кашгари instead of Баласагуни - they are adjacent list items (4 and 5) in the source."
+    },
+    {
+      "id": "yasawi_who",
+      "question": "Кто такой Ходжа Ахмед Ясауи?",
+      "question_type": "кто_такой",
+      "answerable_from_source": true,
+      "expected_facts": ["суфизм", "Книга мудрости"],
+      "acceptable_aliases": {
+        "суфизм": ["суфий", "суфийск", "сопылық"],
+        "Книга мудрости": ["Дивани", "Диван-и хикмет", "хикмет"]
+      },
+      "reference": "Автор труда «Дивани» («Книга мудрости»), написанного на кыпчакском диалекте; благодаря ему суфизм стал играть решающую роль в мировоззрении тюркских народов.",
+      "from_project_brief": true
+    },
+    {
+      "id": "balasaguni_century",
+      "question": "В каком веке жил Юсуф Баласагуни?",
+      "question_type": "век",
+      "answerable_from_source": false,
+      "expected_facts": [],
+      "expected_refusal": true,
+      "reference": "Исторически — XI век, но в страницах 3-23 век не указан (единственные века в тексте: XIII, XVI, XVIII). Grounded-модель должна отказаться отвечать.",
+      "from_project_brief": true
+    },
+    {
+      "id": "farabi_who",
+      "question": "Кто такой аль-Фараби?",
+      "question_type": "кто_такой",
+      "answerable_from_source": true,
+      "expected_facts": ["мыслител"],
+      "acceptable_aliases": {
+        "мыслител": ["философ", "учёный", "ученый"]
+      },
+      "reference": "Абу Насыр Мухаммад аль-Фараби — один из крупнейших мыслителей Востока; его наследие повлияло на учёных Востока и общественно-политическую мысль средневековой Западной Европы.",
+      "from_project_brief": false
+    },
+    {
+      "id": "tauke_khan",
+      "question": "На что была направлена деятельность хана Тауке?",
+      "question_type": "значение",
+      "answerable_from_source": true,
+      "expected_facts": ["защит"],
+      "acceptable_aliases": {
+        "защит": ["оборон", "добрых отношени", "соседними народами"]
+      },
+      "reference": "Деятельность хана Тауке была направлена на обеспечение добрых отношений с соседними народами и защиту казахских земель от внешних врагов.",
+      "from_project_brief": false
+    },
+    {
+      "id": "kashgari_values",
+      "question": "Какое значение Махмуд Кашгари придавал нравственному состоянию общества?",
+      "question_type": "значение",
+      "answerable_from_source": true,
+      "expected_facts": ["патриотизм"],
+      "acceptable_aliases": {
+        "патриотизм": ["верность Родине", "преданность Родине", "храбрость"]
+      },
+      "reference": "Кашгари считал, что процветание общества зависит от нравственного состояния; в гражданах надо воспитывать патриотизм, верность Родине, храбрость.",
+      "from_project_brief": false
+    },
+    {
+      "id": "offtopic_football",
+      "question": "Кто выиграл чемпионат мира по футболу в 2018 году?",
+      "question_type": "off_topic",
+      "answerable_from_source": false,
+      "expected_facts": [],
+      "expected_refusal": true,
+      "reference": "Вне предметной области учебника. Grounded-модель должна отказаться.",
+      "from_project_brief": false
+    },
+    {
+      "id": "offtopic_modern",
+      "question": "Кто является президентом Казахстана сейчас?",
+      "question_type": "off_topic",
+      "answerable_from_source": false,
+      "expected_facts": [],
+      "expected_refusal": true,
+      "reference": "Современная политика отсутствует в страницах 3-23. Grounded-модель должна отказаться.",
+      "from_project_brief": false
+    }
+  ]
+}

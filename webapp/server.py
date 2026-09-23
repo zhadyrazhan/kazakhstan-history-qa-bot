@@ -11,7 +11,7 @@ from pydantic import BaseModel
 load_dotenv()
 
 ROOT_DIR = Path(__file__).parent.parent  # kazakhstan-history-qa-bot/
-HISTORY_TEXT_PATH = ROOT_DIR / "history_text.txt"
+HISTORY_TEXT_PATH = ROOT_DIR / "data" / "history_text.txt"
 STATIC_DIR = Path(__file__).parent / "static"
 CHAT_MODEL = "gpt-5-mini"
 
@@ -47,8 +47,8 @@ def load_context() -> str:
         raise HTTPException(
             status_code=503,
             detail=(
-                "history_text.txt ещё не сгенерирован. Запусти секции 1-6 "
-                "history_finetuning.ipynb (OCR + датасет) и положи файл в корень проекта."
+                "data/history_text.txt ещё не сгенерирован. Запусти секции 1-6 "
+                "history_finetuning.ipynb (OCR + датасет) и положи файл в data/."
             ),
         )
     text = HISTORY_TEXT_PATH.read_text(encoding="utf-8").strip()
