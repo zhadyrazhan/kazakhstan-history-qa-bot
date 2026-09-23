@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
-from google import genai
+from openai import OpenAI
 from pydantic import BaseModel
 
 load_dotenv()
@@ -13,13 +13,13 @@ load_dotenv()
 ROOT_DIR = Path(__file__).parent.parent  # kazakhstan-history-qa-bot/
 HISTORY_TEXT_PATH = ROOT_DIR / "history_text.txt"
 STATIC_DIR = Path(__file__).parent / "static"
-GEMINI_MODEL = "gemini-3.5-flash"
+CHAT_MODEL = "gpt-5-mini"
 
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
-if not GEMINI_API_KEY:
-    raise RuntimeError("Set GEMINI_API_KEY in webapp/.env (copy .env.example)")
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+if not OPENAI_API_KEY:
+    raise RuntimeError("Set OPENAI_API_KEY in webapp/.env (copy .env.example)")
 
-client = genai.Client(api_key=GEMINI_API_KEY)
+client = OpenAI(api_key=OPENAI_API_KEY)
 
 SYSTEM_INSTRUCTION = """Ты — дружелюбный помощник по истории Казахстана для учеников 11 класса.
 Отвечай ТОЛЬКО на основе приведённого ниже фрагмента учебника. Если в тексте
@@ -65,15 +65,16 @@ def ask(req: AskRequest):
 
     context = load_context()
     try:
-        response = client.models.generate_content(
-            model=GEMINI_MODEL,
-            contents=question,
-            config={"system_instruction": SYSTEM_INSTRUCTION.format(context=context)},
+        response = client.responses.create(
+            model=CHAT_MODEL,
+            instructions=SYSTEM_INSTRUCTION.format(context=context),
+            input=question,
+            reasoning={"effort": "minimal"},
         )
     except Exception as e:
-        raise HTTPException(status_code=502, detail=f"Gemini request failed: {e}")
+        raise HTTPException(status_code=502, detail=f"OpenAI request failed: {e}")
 
-    return AskResponse(answer=response.text)
+    return AskResponse(answer=response.output_text)
 
 
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
